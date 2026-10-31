@@ -821,11 +821,13 @@ private:
         }
     }
 
-    // EDEN_NX2_SPARSE_LAZY=0 backs sparse regions whole, as before.
+    // EDEN_NX2_SPARSE_LAZY=0 backs sparse regions whole, as before. Zen build: off by default
+    // (whole regions, as in build 47): with lazy regions Mario Kart World closed on the target PC
+    // (RX 5700 XT, AMD Windows driver); EDEN_NX2_SPARSE_LAZY=1 turns them back on.
     static bool LazySparseRegions() {
         static const bool lazy = [] {
             const char* value = std::getenv("EDEN_NX2_SPARSE_LAZY");
-            return value == nullptr || value[0] != '0';
+            return value != nullptr && value[0] != '0';
         }();
         return lazy;
     }
