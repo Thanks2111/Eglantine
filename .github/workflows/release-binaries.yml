@@ -12,6 +12,8 @@ on:
       - nx2
       - nx2-experimental
       - zen
+      - zen-47
+      - zen-83
     # A binary only changes when build inputs change; docs-only pushes skip the build.
     paths:
       - "src/**"
@@ -49,20 +51,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Zen build (fork Thanks2111/Eglantine): only Windows, all from MinGW clang plus Eden's
-          # PGO profile, tuned for the Ryzen 7 2700 (Zen+, znver1). Two variants, so one still
-          # ships if LTO fails to build: zen-pgo (-march=znver1) and zen-pgo-lto (plus LTO).
+          # Zen build on upstream build 83 (9dca3ab: AMD sparse-memory crash fixed); was build 47,
+          # Ryzen 7 2700 + RX 5700 XT). Three variants; the release ships whichever build:
+          # - avx2: the official MSVC build plus /arch:AVX2
+          # - avx2-lto: the same plus link-time optimization
+          # - zen-pgo: MinGW clang, Eden's PGO profile and -march=znver1 (may not build on 47)
+          - platform: windows-x86_64-avx2
+            runner: windows-2022
+            msvc: true
+          - platform: windows-x86_64-avx2-lto
+            runner: windows-2022
+            msvc: true
+            lto: true
           - platform: windows-x86_64-zen-pgo
             runner: windows-2022
             pgo: true
             mingw: true
             march: znver1
-          - platform: windows-x86_64-zen-pgo-lto
-            runner: windows-2022
-            pgo: true
-            mingw: true
-            march: znver1
-            lto: true
 
     steps:
       - name: Check out source
@@ -124,11 +129,11 @@ jobs:
           test -s eden.profdata
 
       - name: Set up MSVC
-        if: matrix.platform == 'windows-x86_64'
+        if: matrix.msvc
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install Qt on Windows
-        if: matrix.platform == 'windows-x86_64'
+        if: matrix.msvc
         uses: jurplel/install-qt-action@v4
         with:
           version: '6.8.3'
@@ -141,7 +146,7 @@ jobs:
       # MSVC is not something ccache handles well, so that job uses sccache. The other jobs use
       # ccache, which CMake enables through USE_CCACHE (externals/cmake-modules/UseCcache.cmake).
       - name: Install sccache on Windows
-        if: matrix.platform == 'windows-x86_64'
+        if: matrix.msvc
         shell: pwsh
         run: |
           $zip = Join-Path $env:RUNNER_TEMP 'sccache.zip'
@@ -151,12 +156,12 @@ jobs:
           $bin | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
 
       - name: Install Vulkan SDK on Windows
-        if: matrix.platform == 'windows-x86_64'
+        if: matrix.msvc
         shell: pwsh
         run: ./tools/windows/install-vulkan-sdk.ps1
 
       - name: Verify Vulkan tools on Windows
-        if: matrix.platform == 'windows-x86_64'
+        if: matrix.msvc
         shell: pwsh
         run: glslangValidator --version
 
@@ -234,7 +239,7 @@ jobs:
           cmake -S . -B build/release -G Ninja "${flags[@]}"
 
       - name: Configure Windows
-        if: matrix.platform == 'windows-x86_64'
+        if: matrix.msvc
         shell: bash
         run: >-
           cmake -S . -B build/release -G Ninja
@@ -250,6 +255,9 @@ jobs:
           -DUSE_DISCORD_PRESENCE=OFF
           -DCMAKE_C_COMPILER_LAUNCHER=sccache
           -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+          "-DCMAKE_C_FLAGS=/DWIN32 /D_WINDOWS /arch:AVX2"
+          "-DCMAKE_CXX_FLAGS=/DWIN32 /D_WINDOWS /EHsc /arch:AVX2"
+          -DENABLE_LTO=${{ matrix.lto && 'ON' || 'OFF' }}
 
       # MinGW build: system Qt and libraries from MSYS2, clang plus Eden's PGO profile. The profile
       # path is converted to its Windows form because clang runs with the MSYS mount underneath.
@@ -339,7 +347,7 @@ jobs:
           ls -la "$LDAI_OUTPUT"
 
       - name: Package Windows binary
-        if: matrix.platform == 'windows-x86_64'
+        if: matrix.msvc
         shell: pwsh
         run: |
           foreach ($exe in 'eglantine.exe', 'eden-cli.exe') {
@@ -388,7 +396,7 @@ jobs:
       # The artifact is the bin folder itself: GitHub zips artifacts on download, and uploading a
       # zip gave a zip inside a zip. The release job zips it once for the release.
       - name: Upload Windows binary
-        if: matrix.platform == 'windows-x86_64'
+        if: matrix.msvc
         uses: actions/upload-artifact@v4
         with:
           name: eglantine-${{ matrix.platform }}-${{ github.sha }}
