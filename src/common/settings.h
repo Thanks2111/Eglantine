@@ -420,15 +420,6 @@ struct Values {
     SwitchableSetting<bool> frame_gen{linkage, false, "frame_gen", Category::Renderer,
                                       Specialization::Default, true, false};
 
-    SwitchableSetting<FrameGenType> frame_gen_type{linkage,
-                                                   FrameGenType::Fsr3,
-                                                   "frame_gen_type",
-                                                   Category::Renderer,
-                                                   Specialization::Default,
-                                                   true,
-                                                   false,
-                                                   &frame_gen};
-
     SwitchableSetting<u32, true> frame_gen_multiplier{linkage,
                                                       2,
                                                       2,

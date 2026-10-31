@@ -9,7 +9,6 @@
 #include "video_core/renderer_vulkan/present/frame_gen_pacer.h"
 #include "video_core/renderer_vulkan/present/lsfg_chain.h"
 #include "video_core/renderer_vulkan/present/lsfg_shaders.h"
-#include "video_core/renderer_vulkan/present/fsr3_frame_gen.h"
 #include "video_core/vulkan_common/vulkan_memory_allocator.h"
 
 namespace Vulkan {
@@ -40,7 +39,6 @@ private:
 
     std::optional<LsfgShaders> shaders;
     std::optional<LsfgChain> chain;
-    std::optional<Fsr3FrameGen> fsr3_chain;
     FrameGenPacer pacer;
     FrameGenPlan plan{};
     VkExtent2D peak_guest_extent{};
