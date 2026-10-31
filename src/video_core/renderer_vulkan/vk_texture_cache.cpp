@@ -169,10 +169,29 @@ constexpr VkBorderColor ConvertBorderColor(const std::array<float, 4>& color) {
     return bytes * info.resources.layers > (u64{1} << 30);
 }
 
+// Whether Switch 2 sparse images (IsUnwrittenSparse, UsesSparseLayers) are used. Off on AMD's
+// Windows driver: Mario Kart World closes, with nothing logged, when its 8192x8192x68 ASTC terrain
+// array is created as a sparse image on an RX 5700 XT; build 47, before these paths, ran it. Those
+// images get ordinary memory instead (a huge ASTC array is still trimmed by TrimmedHostInfo).
+// EDEN_NX2_SPARSE_IMAGES=1 forces them on, =0 off.
+[[nodiscard]] bool SparseImagesEnabled(const Device& device) {
+    static const int forced = [] {
+        const char* value = std::getenv("EDEN_NX2_SPARSE_IMAGES");
+        return value == nullptr ? -1 : (value[0] == '0' ? 0 : 1);
+    }();
+    if (forced >= 0) {
+        return forced == 1;
+    }
+    return device.GetDriverID() != VK_DRIVER_ID_AMD_PROPRIETARY;
+}
+
 // A large image over Switch 2 sparse blocks nobody has written (title 1's terrain layer pools, 2.9
 // GB of R8/RG16/R16 that stay empty in the attract demo) is all zeros: it gets no device memory
 // until a write makes the texture cache replace it.
-[[nodiscard]] bool IsUnwrittenSparse(const ImageInfo& info, GPUVAddr gpu_addr) {
+[[nodiscard]] bool IsUnwrittenSparse(const Device& device, const ImageInfo& info, GPUVAddr gpu_addr) {
+    if (!SparseImagesEnabled(device)) {
+        return false;
+    }
     constexpr u32 MinSize = 32U << 20;
     const u32 size = VideoCommon::CalculateGuestSizeInBytes(info);
     return size >= MinSize && info.type != ImageType::e1D && info.type != ImageType::Buffer &&
@@ -184,8 +203,8 @@ constexpr VkBorderColor ConvertBorderColor(const std::array<float, 4>& color) {
 // Image::BindLayers. Only formats uploaded layer by layer: huge ASTC arrays (GPU decode) and
 // formats the host samples as they are.
 [[nodiscard]] bool UsesSparseLayers(const Device& device, const ImageInfo& info, GPUVAddr gpu_addr) {
-    if (!device.IsSparseResidencyImage2DSupported() || info.type != ImageType::e2D ||
-        info.resources.layers <= 1 || info.num_samples != 1 ||
+    if (!SparseImagesEnabled(device) || !device.IsSparseResidencyImage2DSupported() ||
+        info.type != ImageType::e2D || info.resources.layers <= 1 || info.num_samples != 1 ||
         VideoCore::Surface::GetFormatType(info.format) != VideoCore::Surface::SurfaceType::ColorTexture) {
         return false;
     }
@@ -2089,7 +2108,7 @@ Image::Image(TextureCacheRuntime& runtime_, const ImageInfo& info_, GPUVAddr gpu
                                    : runtime->ViewFormats(info.format),
                                AstcHostFormat(runtime_.device, info),
                                UsesSparseLayers(runtime_.device, info, gpu_addr_) ||
-                                   IsUnwrittenSparse(info, gpu_addr_))),
+                                   IsUnwrittenSparse(runtime_.device, info, gpu_addr_))),
       aspect_mask(ImageAspectMask(info.format)) {
     if (original_image.IsUnbacked()) {
         flags |= VideoCommon::ImageFlagBits::Unbacked;
