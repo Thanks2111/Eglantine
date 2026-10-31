@@ -227,10 +227,11 @@ void PhysicalCore::LogBacktrace(KernelCore& kernel) {
 void PhysicalCore::Idle() {
     // Guest job systems hand work between cores many times per frame; blocking at once adds the
     // host's thread wake-up latency to every handoff. EDEN_NX2_IDLE_SPIN_US=<n>: poll for that
-    // many microseconds before blocking.
+    // many microseconds before blocking. Zen build: 50 us by default (measured best on a
+    // Ryzen 7 2700 + RX 5700 XT in Mario Kart World: 24-27 FPS vs 21-25 with 0, worse at 100+).
     static const auto spin = std::chrono::microseconds{[] {
         const char* text = std::getenv("EDEN_NX2_IDLE_SPIN_US");
-        return text ? std::strtoll(text, nullptr, 10) : 0LL;
+        return text ? std::strtoll(text, nullptr, 10) : 50LL;
     }()};
     if (spin.count() > 0) {
         const auto deadline = std::chrono::steady_clock::now() + spin;
