@@ -241,7 +241,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_TESTING=OFF
           -DYUZU_TESTS=OFF
-          -DYUZU_CMD=ON
+          -DYUZU_CMD=OFF
           -DYUZU_ROOM=OFF
           -DYUZU_ROOM_STANDALONE=OFF
           -DYUZU_USE_BUNDLED_QT=OFF
@@ -346,7 +346,7 @@ jobs:
         if: matrix.msvc
         shell: pwsh
         run: |
-          foreach ($exe in 'eden.exe', 'eden-cli.exe') {
+          foreach ($exe in @('eden.exe')) {
             if (-not (Test-Path "build/release/bin/$exe")) {
               throw "build/release/bin/$exe was not produced"
             }
