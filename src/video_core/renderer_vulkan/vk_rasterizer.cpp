@@ -1336,7 +1336,15 @@ void RasterizerVulkan::FlushWork() {
     if ((++draw_counter & CHECK_MASK) != CHECK_MASK) {
         return;
     }
-    if (draw_counter < DRAWS_TO_DISPATCH) {
+    // EDEN_NX2_FLUSH_DRAWS=<draws>: submit to the host GPU this often instead (selevet-eglantine
+    // used 128). Off by default here: earlier submits change when memory is released.
+    static const u32 draws_to_flush = [] {
+        const char* value = std::getenv("EDEN_NX2_FLUSH_DRAWS");
+        return value != nullptr
+                   ? (std::max)(static_cast<u32>(std::atoi(value)) & ~CHECK_MASK, CHECK_MASK + 1)
+                   : DRAWS_TO_DISPATCH;
+    }();
+    if (draw_counter < draws_to_flush) {
         scheduler.DispatchWork();
         return;
     }

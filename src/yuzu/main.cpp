@@ -78,6 +78,13 @@ static Qt::HighDpiScaleFactorRoundingPolicy GetHighDpiRoundingPolicy() {
 }
 
 int main(int argc, char* argv[]) {
+#ifdef _WIN32
+    // High process priority (from selevet-eglantine): the emulator's CPU and GPU threads are the
+    // bottleneck on 8-core CPUs. EDEN_NX2_HIGH_PRIORITY=0 leaves it at normal.
+    if (const char* value = std::getenv("EDEN_NX2_HIGH_PRIORITY"); value == nullptr || value[0] != '0') {
+        SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+    }
+#endif
 #if YUZU_ROOM
     bool launch_room = false;
     for (int i = 1; i < argc; i++) {

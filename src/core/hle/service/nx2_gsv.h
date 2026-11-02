@@ -934,7 +934,15 @@ private:
         if (!Settings::values.use_speed_limit.GetValue() || Settings::SpeedLimit() == 0) {
             return;
         }
-        const auto interval = std::chrono::nanoseconds{100'000'000'000LL / 60 / Settings::SpeedLimit()};
+        // EDEN_NX2_PRESENT_HZ=<rate>: hold presents to this rate instead of 60 (from
+        // sylvieistaken/selevet-eglantine "30FPS PATCH": Mario Kart World keeps its full game speed
+        // at 30, so a CPU that cannot hold 60 gets a steady 30 instead of slow motion).
+        static const long long present_hz = [] {
+            const char* text = std::getenv("EDEN_NX2_PRESENT_HZ");
+            return text ? (std::max)(std::strtoll(text, nullptr, 10), 1LL) : 60LL;
+        }();
+        const auto interval =
+            std::chrono::nanoseconds{100'000'000'000LL / present_hz / Settings::SpeedLimit()};
         const auto now = std::chrono::steady_clock::now();
         if (now > m_next_vblank + interval) {
             // Running slower than 60 fps: show at once and don't bank the lost time.
