@@ -230,7 +230,7 @@ void PhysicalCore::Idle() {
     // many microseconds before blocking.
     static const auto spin = std::chrono::microseconds{[] {
         const char* text = std::getenv("EDEN_NX2_IDLE_SPIN_US");
-        return text ? std::strtoll(text, nullptr, 10) : 0LL;
+        return text ? std::strtoll(text, nullptr, 10) : 50LL;
     }()};
     if (spin.count() > 0) {
         const auto deadline = std::chrono::steady_clock::now() + spin;
