@@ -240,8 +240,12 @@ constexpr std::array<VkFormat, 2> OpaqueAstcViewFormats{VK_FORMAT_BC1_RGBA_UNORM
     if (decoded_bytes(0) <= (u64{1} << 30)) {
         return info;
     }
+    // 512 MiB per array on big cards; 128 MiB under 10 GiB of device memory (8 GB cards), where
+    // two of title 1's terrain arrays at 512 MiB each leave no room for the course's textures.
+    const u64 keep_bytes = device.GetDeviceLocalMemory() < (u64{10} << 30) ? (u64{128} << 20)
+                                                                           : (u64{512} << 20);
     while (level_offset + 1 < static_cast<u32>(info.resources.levels) &&
-           decoded_bytes(level_offset) > (u64{512} << 20)) {
+           decoded_bytes(level_offset) > keep_bytes) {
         ++level_offset;
     }
     ImageInfo host = info;

@@ -206,8 +206,10 @@ void TextureCache<P>::TickFrame() {
         if (!native_thresholds_applied && gpu_memory != nullptr && gpu_memory->UsesNativeTiling()) {
             native_thresholds_applied = true;
             const u64 device_local = runtime.GetDeviceLocalMemory();
-            critical_memory = (std::max)(critical_memory, device_local - 256_MiB);
-            expected_memory = (std::max)(expected_memory, device_local - 1280_MiB);
+            if (device_local >= 10_GiB) {
+                critical_memory = (std::max)(critical_memory, device_local - 256_MiB);
+                expected_memory = (std::max)(expected_memory, device_local - 1280_MiB);
+            }
             ApplyThresholdOverrides();
             native_critical_memory = critical_memory;
             native_expected_memory = expected_memory;
@@ -225,7 +227,11 @@ void TextureCache<P>::TickFrame() {
                 const u64 budget = runtime.GetDeviceMemoryBudget();
                 if (budget > 2_GiB) {
                     const u64 old_critical = critical_memory;
-                    const u64 margin = (std::min)(budget / 8, 1_GiB);
+                    // Cards under 10 GiB (8 GB AMD: 7.0 GB budget) keep a wider margin: the
+                    // driver budget moves while a course loads, and an overrun gives unbacked
+                    // images, which the AMD Windows driver does not survive.
+                    const u64 margin = budget < 10_GiB ? (std::max)(budget / 5, 1_GiB)
+                                                       : (std::min)(budget / 8, 1_GiB);
                     critical_memory = budget - margin;
                     expected_memory = budget - 2 * margin;
                     // Log the first values and real changes (the budget moves by a few MiB all
