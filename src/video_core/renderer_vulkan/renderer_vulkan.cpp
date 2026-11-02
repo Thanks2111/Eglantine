@@ -222,6 +222,10 @@ void RendererVulkan::Composite(std::span<const Tegra::FramebufferConfig> framebu
                                swapchain.GetImageViewFormat());
 
 #ifdef HAS_LSFG
+    // Frame generation cannot be toggled while a game runs: with it off, keep the plain present
+    // path (no per-frame work dispatch, no LSFG shader setup), like a build without it.
+    const bool frame_gen_on = Settings::values.frame_gen.GetValue();
+    if (frame_gen_on) {
     void(frame_gen.WantedGenerations(present_manager.MaxExtraFrames()));
 
     frame_gen.Process(device, frame, present_manager.SwapchainImageFormat(),
@@ -235,13 +239,16 @@ void RendererVulkan::Composite(std::span<const Tegra::FramebufferConfig> framebu
         scheduler.Flush(*generated->render_ready);
         present_manager.Present(generated);
     }
+    }
 #endif
 
     scheduler.Flush(*frame->render_ready);
 
     present_manager.Present(frame);
 #ifdef HAS_LSFG
-    scheduler.DispatchWork();
+    if (frame_gen_on) {
+        scheduler.DispatchWork();
+    }
 #endif
 
     gpu.RendererFrameEndNotify();
