@@ -61,10 +61,12 @@ jobs:
           - platform: windows-x86_64-avx2
             runner: windows-2022
             msvc: true
-          - platform: windows-x86_64-avx2-lto
+          # clang-cl (Clang with the MSVC ABI), as Wael3rd builds his releases: clearly faster than
+          # MSVC for this code base.
+          - platform: windows-x86_64-clang
             runner: windows-2022
             msvc: true
-            lto: true
+            clang: true
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -255,6 +257,7 @@ jobs:
           "-DCMAKE_C_FLAGS=/DWIN32 /D_WINDOWS /arch:AVX2"
           "-DCMAKE_CXX_FLAGS=/DWIN32 /D_WINDOWS /EHsc /arch:AVX2"
           -DENABLE_LTO=${{ matrix.lto && 'ON' || 'OFF' }}
+          ${{ matrix.clang && '-DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl' || '' }}
 
       # MinGW build: system Qt and libraries from MSYS2, clang plus Eden's PGO profile. The profile
       # path is converted to its Windows form because clang runs with the MSYS mount underneath.
