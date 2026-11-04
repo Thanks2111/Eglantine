@@ -21,7 +21,7 @@ TEST_CASE("Linear graphics backing allocation reuses released pages", "[kernel][
     Kernel::KPageHeap heap;
     const auto management_size = Kernel::KPageHeap::CalculateManagementOverheadSize(HeapSize);
     heap.Initialize(HeapStart, HeapSize,
-                    Kernel::KVirtualAddress{std::numeric_limits<uintptr_t>::max() - management_size},
+                    Kernel::KVirtualAddress{(std::numeric_limits<uintptr_t>::max)() - management_size},
                     management_size);
     heap.Free(HeapStart, HeapSize / Kernel::PageSize);
 

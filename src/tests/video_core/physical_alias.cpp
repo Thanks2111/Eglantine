@@ -32,7 +32,7 @@ TEST_CASE("Framebuffer aliases require matching physical backing on every page",
     CHECK_FALSE(VideoCommon::IsSamePhysicalRange(0, 0x4001, 1, translate));
     CHECK_FALSE(VideoCommon::IsSamePhysicalRange(0, 0x4000, 0, translate));
     CHECK_FALSE(VideoCommon::IsSamePhysicalRange(
-        std::numeric_limits<u64>::max() - 0xfff, 0x4000, 0x1000, translate));
+        (std::numeric_limits<u64>::max)() - 0xfff, 0x4000, 0x1000, translate));
     CHECK_FALSE(VideoCommon::IsSamePhysicalRange(
-        0, std::numeric_limits<u64>::max() - 0xfff, 0x1000, translate));
+        0, (std::numeric_limits<u64>::max)() - 0xfff, 0x1000, translate));
 }

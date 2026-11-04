@@ -33,7 +33,7 @@ public:
     };
 
     static bool Valid(u64 address, u64 size) {
-        return size != 0 && size <= std::numeric_limits<u64>::max() - address;
+        return size != 0 && size <= (std::numeric_limits<u64>::max)() - address;
     }
 
     static std::optional<Range> ImageRange(u64 address, u64 bound, u64 offset, u64 size) {
@@ -43,7 +43,7 @@ public:
         }
         const u64 first = address + offset;
         const u64 last = first + size - 1;
-        if (last > std::numeric_limits<u64>::max() - 0x1000) {
+        if (last > (std::numeric_limits<u64>::max)() - 0x1000) {
             return std::nullopt;
         }
         const u64 start = first & ~u64{0xfff};

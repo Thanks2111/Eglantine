@@ -129,19 +129,19 @@ bool Argument::GetImmediateU1() const noexcept {
 
 u8 Argument::GetImmediateU8() const noexcept {
     const u64 imm = value.GetImmediateAsU64();
-    ASSERT(imm <= u64(std::numeric_limits<u8>::max()));
+    ASSERT(imm <= u64((std::numeric_limits<u8>::max)()));
     return u8(imm);
 }
 
 u16 Argument::GetImmediateU16() const noexcept {
     const u64 imm = value.GetImmediateAsU64();
-    ASSERT(imm <= u64(std::numeric_limits<u16>::max()));
+    ASSERT(imm <= u64((std::numeric_limits<u16>::max)()));
     return u16(imm);
 }
 
 u32 Argument::GetImmediateU32() const noexcept {
     const u64 imm = value.GetImmediateAsU64();
-    ASSERT(imm <= u64(std::numeric_limits<u32>::max()));
+    ASSERT(imm <= u64((std::numeric_limits<u32>::max)()));
     return u32(imm);
 }
 

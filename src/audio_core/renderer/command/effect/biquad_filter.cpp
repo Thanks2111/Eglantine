@@ -58,8 +58,8 @@ void ApplyBiquadFilterFloat(std::span<s32> output, std::span<const s32> input,
 void ApplyBiquadFilterFloat2(std::span<s32> output, std::span<const s32> input,
                              std::array<f32, 3>& b, std::array<f32, 2>& a,
                              VoiceState::BiquadFilterState& state, const u32 sample_count) {
-    constexpr f64 min{std::numeric_limits<s32>::min()};
-    constexpr f64 max{std::numeric_limits<s32>::max()};
+    constexpr f64 min{(std::numeric_limits<s32>::min)()};
+    constexpr f64 max{(std::numeric_limits<s32>::max)()};
 
     std::array<f64, 3> b_double{static_cast<f64>(b[0]), static_cast<f64>(b[1]),
                                 static_cast<f64>(b[2])};

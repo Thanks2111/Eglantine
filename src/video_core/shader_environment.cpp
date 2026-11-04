@@ -674,7 +674,7 @@ GraphicsEnvironment::GraphicsEnvironment(Tegra::Engines::Maxwell3D& maxwell3d_,
         if (program == Maxwell::ShaderType::Pixel && std::getenv("EDEN_NX2_SHADER_DUMP")) {
             static u32 gather_probes{};
             const auto mapped = [&](GPUVAddr address, u64 size) {
-                return size != 0 && size - 1 <= std::numeric_limits<GPUVAddr>::max() - address &&
+                return size != 0 && size - 1 <= (std::numeric_limits<GPUVAddr>::max)() - address &&
                        gpu_memory->IsWithinGPUAddressRange(address) &&
                        gpu_memory->IsWithinGPUAddressRange(address + size - 1) &&
                        gpu_memory->IsFullyMappedRange(address, size);
@@ -709,7 +709,7 @@ GraphicsEnvironment::GraphicsEnvironment(Tegra::Engines::Maxwell3D& maxwell3d_,
                             const GPUVAddr pool = regs.tex_header.Address();
                             const u64 descriptor_offset = u64{pair.first} * sizeof(Tegra::Texture::TICEntry);
                             if (pair.first > regs.tex_header.limit ||
-                                descriptor_offset > std::numeric_limits<GPUVAddr>::max() - pool ||
+                                descriptor_offset > (std::numeric_limits<GPUVAddr>::max)() - pool ||
                                 !mapped(pool + descriptor_offset, sizeof(Tegra::Texture::TICEntry))) {
                                 LOG_WARNING(Shader, "Native gather provenance: program={:#x} "
                                             "bank={} offset={:#x} handle={:#x} tic={} tsc={} "

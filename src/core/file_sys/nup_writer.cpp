@@ -471,7 +471,7 @@ Layout BuildLayout(const Plan& plan) {
     for (const auto& file : layout.files) {
         layout.Intern(file.name);
     }
-    if (layout.pool.size() > std::numeric_limits<u32>::max()) {
+    if (layout.pool.size() > (std::numeric_limits<u32>::max)()) {
         throw PackError(PackResult::InvalidSource, "the dump's file names are too long");
     }
 
@@ -539,7 +539,7 @@ public:
             for (const auto& entry : fs::directory_iterator(updates, ec)) {
                 const auto version = ParseDecimal(ToUtf8(entry.path().filename()));
                 if (version && entry.is_directory(ec) && HasContent(entry.path())) {
-                    if (*version > std::numeric_limits<u32>::max()) {
+                    if (*version > (std::numeric_limits<u32>::max)()) {
                         throw PackError(PackResult::InvalidSource,
                                         "update version out of range: " + ToUtf8(entry.path()));
                     }
@@ -1267,7 +1267,7 @@ private:
         Seek(cursor);
         std::vector<std::pair<u64, u32>> meta;
         for (const auto& package : plan.packages) {
-            if (package.meta.size() > std::numeric_limits<u32>::max()) {
+            if (package.meta.size() > (std::numeric_limits<u32>::max)()) {
                 throw PackError(PackResult::IoError, "package metadata is too large");
             }
             meta.emplace_back(package.meta.empty() ? 0 : cursor,

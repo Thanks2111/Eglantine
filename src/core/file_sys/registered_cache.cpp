@@ -372,7 +372,7 @@ std::vector<ContentProviderEntry> ContentProvider::ListEntries() const {
 std::optional<u64> ContentProvider::GetParentApplicationId(u64 program_id) const {
     const auto application_id = GetBaseTitleID(program_id);
     const auto program_index = program_id - application_id;
-    if (program_index == 0 || program_index > std::numeric_limits<u8>::max()) {
+    if (program_index == 0 || program_index > (std::numeric_limits<u8>::max)()) {
         return std::nullopt;
     }
     if (!ListEntriesFilter(TitleType::Application, ContentRecordType::Meta, program_id).empty()) {

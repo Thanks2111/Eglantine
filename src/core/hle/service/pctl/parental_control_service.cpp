@@ -400,7 +400,7 @@ Result IParentalControlService::IsPlayTimerEnabled(Out<bool> out_is_play_timer_e
 
 Result IParentalControlService::GetPlayTimerRemainingTime(Out<s32> out_remaining_time) {
     LOG_WARNING(Service_PCTL, "(STUBBED) called");
-    *out_remaining_time = std::numeric_limits<s32>::max();
+    *out_remaining_time = (std::numeric_limits<s32>::max)();
     R_SUCCEED();
 }
 

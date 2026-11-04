@@ -21,6 +21,6 @@ TEST_CASE("Host commit pressure limits reclaimable cache budgets", "[memory_budg
             LimitBudgetForHostCommit(10_GiB, 7_GiB, 6_GiB, 4_GiB));
     REQUIRE(LimitBudgetForHostCommit(6_GiB, 8_GiB, 20_GiB, 4_GiB) == 6_GiB);
     REQUIRE(LimitBudgetForHostCommit(6_GiB, 8_GiB, 3_GiB, 4_GiB) == 6_GiB);
-    REQUIRE(LimitBudgetForHostCommit(10_GiB, 8_GiB, std::numeric_limits<u64>::max(), 4_GiB) ==
+    REQUIRE(LimitBudgetForHostCommit(10_GiB, 8_GiB, (std::numeric_limits<u64>::max)(), 4_GiB) ==
             10_GiB);
 }

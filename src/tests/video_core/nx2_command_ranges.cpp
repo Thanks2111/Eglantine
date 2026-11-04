@@ -70,7 +70,7 @@ TEST_CASE("GPU-written command range guards avoid empty scans and wrapped ranges
         return std::nullopt;
     };
     CHECK_FALSE(Tegra::Nx2HasGpuWrittenPage(GpuBase, 0, translate));
-    CHECK(Tegra::Nx2HasGpuWrittenPage(std::numeric_limits<GPUVAddr>::max() - 1, 4, translate));
+    CHECK(Tegra::Nx2HasGpuWrittenPage((std::numeric_limits<GPUVAddr>::max)() - 1, 4, translate));
     CHECK(translations == 0);
 }
 

@@ -3412,7 +3412,7 @@ private:
         const auto& image = it->second;
         const u64 index = handle - it->first;
         if (index >= image.count || image.size == 0 ||
-            index > (std::numeric_limits<u64>::max() - image.offset) / image.size) {
+            index > ((std::numeric_limits<u64>::max)() - image.offset) / image.size) {
             InvalidNativeImage(ctx);
             return;
         }
@@ -3442,7 +3442,7 @@ private:
             const auto range = Nx2GpuMappingTable::ImageRange(memory_address, bound, image_offset,
                                                             layout.size);
             if (!range || layout.size != image.size ||
-                layout.size > std::numeric_limits<u32>::max()) {
+                layout.size > (std::numeric_limits<u32>::max)()) {
                 InvalidNativeImage(ctx);
                 return;
             }

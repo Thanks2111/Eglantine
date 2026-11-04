@@ -113,9 +113,9 @@ TEST_CASE("NX2 host readback cache cannot span physical pages or overflow a rang
              {0, YUZU_PAGESIZE + 1},
              {YUZU_PAGESIZE, 1},
              {0, 0},
-             {1, std::numeric_limits<u64>::max()},
-             {std::numeric_limits<u64>::max(), 1},
-             {std::numeric_limits<u64>::max(), std::numeric_limits<u64>::max()},
+             {1, (std::numeric_limits<u64>::max)()},
+             {(std::numeric_limits<u64>::max)(), 1},
+             {(std::numeric_limits<u64>::max)(), (std::numeric_limits<u64>::max)()},
          }}) {
         CAPTURE(offset, size);
         read.cache.Remember(read.page, read.area, read.page, 1, 11);
@@ -231,8 +231,8 @@ TEST_CASE("NX2 host readback cache rejects invalid page certificates",
         read.area.end_address += YUZU_PAGESIZE;
     }
     SECTION("the device page end would overflow") {
-        read.page.device_page = std::numeric_limits<u64>::max() - YUZU_PAGESIZE + 1;
-        read.area.end_address = std::numeric_limits<u64>::max();
+        read.page.device_page = (std::numeric_limits<u64>::max)() - YUZU_PAGESIZE + 1;
+        read.area.end_address = (std::numeric_limits<u64>::max)();
     }
     read.cache.Remember(read.page, read.area, read.page, 1, 11);
     REQUIRE_FALSE(read.cache.CanReuse(read.page, 1, 11, 0, 4));

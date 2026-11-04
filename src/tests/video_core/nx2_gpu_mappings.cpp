@@ -20,7 +20,7 @@ TEST_CASE("Nx2 native image mappings validate bound page extents", "[nx2_mapping
     CHECK_FALSE(Nx2GpuMappingTable::ImageRange(0, 0x4000, 0, 0x1000));
     CHECK_FALSE(Nx2GpuMappingTable::ImageRange(0x10000, 0x4000, 0, 0));
     CHECK_FALSE(Nx2GpuMappingTable::ImageRange(
-        std::numeric_limits<u64>::max() - 0x1000, 0x2000, 0, 0x1000));
+        (std::numeric_limits<u64>::max)() - 0x1000, 0x2000, 0, 0x1000));
 }
 
 TEST_CASE("Nx2 native image leases share mappings across handles", "[nx2_mapping]") {

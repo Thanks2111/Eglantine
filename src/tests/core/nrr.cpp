@@ -53,7 +53,7 @@ void CheckNrrLayout(size_t signed_offset, size_t header_size) {
         REQUIRE_FALSE(read().IsValid(0x1000));
     }
     SECTION("Hash count cannot overflow") {
-        put(signed_offset + 0x14, std::numeric_limits<u32>::max());
+        put(signed_offset + 0x14, (std::numeric_limits<u32>::max)());
         REQUIRE_FALSE(read().IsValid(0x1000));
     }
     SECTION("Switch 2 signature bytes are not a valid hash count") {

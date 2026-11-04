@@ -86,7 +86,7 @@ TEST_CASE("NSO loading rejects invalid segments", "[core][loader][nso]") {
     }
 
     SECTION("Segment offset is past EOF") {
-        header.segments[0].offset = std::numeric_limits<u32>::max();
+        header.segments[0].offset = (std::numeric_limits<u32>::max)();
         valid = false;
     }
 
@@ -96,7 +96,7 @@ TEST_CASE("NSO loading rejects invalid segments", "[core][loader][nso]") {
     }
 
     SECTION("Image size overflows") {
-        header.segments[2].location = std::numeric_limits<u32>::max();
+        header.segments[2].location = (std::numeric_limits<u32>::max)();
         valid = false;
     }
 

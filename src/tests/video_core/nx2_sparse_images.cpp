@@ -32,7 +32,7 @@ TEST_CASE("Sparse image data ranges clip and coalesce written blocks", "[nx2_spa
           std::vector<std::pair<u64, u64>>{{0, 3 * tile}});
     CHECK(Tegra::Nx2SparseDataRanges(base - 1, tile).empty());
     CHECK(Tegra::Nx2SparseDataRanges(base, 0).empty());
-    CHECK(Tegra::Nx2SparseDataRanges(base, std::numeric_limits<u64>::max()).empty());
+    CHECK(Tegra::Nx2SparseDataRanges(base, (std::numeric_limits<u64>::max)()).empty());
     Tegra::Nx2ClearSparseRegions();
 }
 
@@ -60,7 +60,7 @@ TEST_CASE("Invalid sparse tile updates cannot discard coarse residency", "[nx2_s
     Tegra::Nx2SparseRegionCreated(base, 4 * tile, 4 * tile);
     Tegra::Nx2SparseBlockWritten(base, 0);
     Tegra::Nx2SparseTilesMapped(base, 4 * tile, tile, true);
-    Tegra::Nx2SparseTilesMapped(base, 0, std::numeric_limits<u64>::max(), true);
+    Tegra::Nx2SparseTilesMapped(base, 0, (std::numeric_limits<u64>::max)(), true);
     CHECK(Tegra::Nx2SparseDataRanges(base, 4 * tile) ==
           std::vector<std::pair<u64, u64>>{{0, 4 * tile}});
     Tegra::Nx2ClearSparseRegions();
@@ -69,7 +69,7 @@ TEST_CASE("Invalid sparse tile updates cannot discard coarse residency", "[nx2_s
 TEST_CASE("Sparse data range ends cannot overflow a large backing block", "[nx2_sparse_image]") {
     Tegra::Nx2ClearSparseRegions();
     constexpr u64 block = 1ULL << 63;
-    Tegra::Nx2SparseRegionCreated(0, std::numeric_limits<u64>::max(), block);
+    Tegra::Nx2SparseRegionCreated(0, (std::numeric_limits<u64>::max)(), block);
     Tegra::Nx2SparseBlockWritten(0, 1);
     CHECK(Tegra::Nx2SparseDataRanges(block, block - 1) ==
           std::vector<std::pair<u64, u64>>{{0, block - 1}});

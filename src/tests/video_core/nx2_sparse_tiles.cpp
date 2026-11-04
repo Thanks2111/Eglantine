@@ -84,11 +84,11 @@ TEST_CASE("Nx2 216 rejects overflowing and unaligned guest ranges", "[nx2_tiles]
     CHECK(request.Valid());
     CHECK(request.Backing(0x200000, 0x3000) == u64{0x202000});
     CHECK_FALSE(request.Backing(0x200000, 0x2fff));
-    request.offset = std::numeric_limits<u64>::max() - 0xfff;
+    request.offset = (std::numeric_limits<u64>::max)() - 0xfff;
     CHECK_FALSE(request.Backing(0x200000, 0x3000));
     request.offset = 0;
-    CHECK_FALSE(request.Backing(std::numeric_limits<u64>::max() - 0xfff, 0x2000));
-    request.gpu_address = std::numeric_limits<u64>::max() - 0xfff;
+    CHECK_FALSE(request.Backing((std::numeric_limits<u64>::max)() - 0xfff, 0x2000));
+    request.gpu_address = (std::numeric_limits<u64>::max)() - 0xfff;
     CHECK_FALSE(request.Valid());
     request.gpu_address = 0x100001;
     CHECK_FALSE(request.Valid());
@@ -108,7 +108,7 @@ TEST_CASE("Nx2 guest tiles cancel pending lazy publication without rearming it",
     CHECK_FALSE(state.BeginBacking(0));
     CHECK_FALSE(state.MarkWritten(0, 0));
     CHECK_FALSE(state.MarkWritten(state.size - 1, 2));
-    CHECK_FALSE(state.MarkWritten(std::numeric_limits<u64>::max(), 1));
+    CHECK_FALSE(state.MarkWritten((std::numeric_limits<u64>::max)(), 1));
     CHECK(state.MarkWritten(Nx2SparseRegion::BlockSize - 0x1000, 0x2000));
     CHECK(state.blocks[0] == Nx2SparseRegion::Block::Written);
     CHECK(state.blocks[1] == Nx2SparseRegion::Block::Written);

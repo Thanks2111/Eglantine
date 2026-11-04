@@ -131,7 +131,7 @@ TEST_CASE("Descriptor limits clear exposed slots after shrink and growth", "[des
         CHECK_FALSE(table.Read(memory, limit).second);
     }
     for (const u32 limit :
-         {std::numeric_limits<u32>::max(), std::numeric_limits<u32>::max() - 0x1000}) {
+         {(std::numeric_limits<u32>::max)(), (std::numeric_limits<u32>::max)() - 0x1000}) {
         VideoCommon::DescriptorTable<u64> table;
         table.Refresh(0x1000, limit);
         CHECK(table.Read(memory, 0).second);
