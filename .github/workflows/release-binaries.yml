@@ -600,14 +600,14 @@ jobs:
           set -euo pipefail
           mkdir -p dist
           # one artifact lands directly in artifacts/ (no folder per artifact)
-          dir=Lichii-Bruno-Zen3-build95
+          dir=Lichii-Bruno-Zen3-novo
           mv artifacts "$dir"
           test -f "$dir/lichii.exe"
           printf '@echo off\r\nset "EDEN_NX2_SWAP_INTERVAL=2"\r\ncd /d "%%~dp0"\r\nstart "" /high "%%~dp0lichii.exe"\r\n' > "$dir/ZELDA-30FPS.bat"
           printf '@echo off\r\ncd /d "%%~dp0"\r\nstart "" /high "%%~dp0lichii.exe"\r\n' > "$dir/LICHII-SEM-TRAVA.bat"
-          zip -qr "dist/lichii-bruno-zen3-build95-windows.zip" "$dir"
+          zip -qr "dist/lichii-bruno-zen3-novo-windows.zip" "$dir"
           ls -la dist
           tag="lichii-bruno-${GITHUB_RUN_NUMBER}"
           gh release create "$tag" dist/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
-            --title "Lichii (build 95 + fixes) para Ryzen 5700X - $tag" \
-            --notes "Lichii build 95 (222877d), mesmo codigo da versao oficial, compilado com clang + PGO e otimizado para Zen 3 (Ryzen 7 5700X). Duas versoes: pgo e pgo-lto (ThinLTO). Use o atalho ZELDA-30FPS.bat."
+            --title "Lichii codigo novo (b7ff181, 07/11) para Ryzen 5700X - $tag" \
+            --notes "Lichii main b7ff181 (07/11): mesh shaders via compute para placas sem VK_EXT_mesh_shader (RX 5700), espera limitada de pipelines, Kokiri ~11% mais rapido. Compilado com clang + PGO para Zen 3. Teste numa pasta separada; use ZELDA-30FPS.bat."
