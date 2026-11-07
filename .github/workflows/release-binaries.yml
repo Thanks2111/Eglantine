@@ -61,12 +61,6 @@ jobs:
             mingw: true
             cflags: "-march=znver3 -mtune=znver3"
             ldflags: ""
-          - platform: windows-x86_64-pgo-lto
-            runner: windows-2022
-            pgo: true
-            mingw: true
-            cflags: "-march=znver3 -mtune=znver3 -flto=thin"
-            ldflags: "-flto=thin"
 
     steps:
       - name: Check out source
@@ -605,12 +599,15 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          for d in artifacts/*/; do
-            n=$(basename "$d"); n=${n%-${GITHUB_SHA}}
-            (cd "$d" && zip -qr "$GITHUB_WORKSPACE/dist/$n.zip" .)
-          done
+          # one artifact lands directly in artifacts/ (no folder per artifact)
+          dir=Lichii-Bruno-Zen3-build95
+          mv artifacts "$dir"
+          test -f "$dir/lichii.exe"
+          printf '@echo off\r\nset "EDEN_NX2_SWAP_INTERVAL=2"\r\ncd /d "%%~dp0"\r\nstart "" /high "%%~dp0lichii.exe"\r\n' > "$dir/ZELDA-30FPS.bat"
+          printf '@echo off\r\ncd /d "%%~dp0"\r\nstart "" /high "%%~dp0lichii.exe"\r\n' > "$dir/LICHII-SEM-TRAVA.bat"
+          zip -qr "dist/lichii-bruno-zen3-build95-windows.zip" "$dir"
           ls -la dist
           tag="lichii-bruno-${GITHUB_RUN_NUMBER}"
           gh release create "$tag" dist/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
             --title "Lichii (build 95 + fixes) para Ryzen 5700X - $tag" \
-            --notes "Lichii nx2-experimental ${GITHUB_SHA:0:7}, compilado com clang + PGO e otimizado para Zen 3 (Ryzen 7 5700X). Duas versoes: pgo e pgo-lto (ThinLTO). Use o atalho ZELDA-30FPS.bat."
+            --notes "Lichii build 95 (222877d), mesmo codigo da versao oficial, compilado com clang + PGO e otimizado para Zen 3 (Ryzen 7 5700X). Duas versoes: pgo e pgo-lto (ThinLTO). Use o atalho ZELDA-30FPS.bat."
